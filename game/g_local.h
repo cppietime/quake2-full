@@ -445,6 +445,16 @@ typedef struct
 
 	int			power_armor_type;
 	int			power_armor_power;
+
+	// MOD BEGIN
+
+	int			exp;
+	int			level;
+	float		produce_time;
+	int			produce_val;
+
+	// MOD END
+
 } monsterinfo_t;
 
 
@@ -647,6 +657,10 @@ char	*vtos (vec3_t v);
 
 float vectoyaw (vec3_t vec);
 void vectoangles (vec3_t vec, vec3_t angles);
+
+// MOD BEGIN
+void anglestovec(vec3_t angles, vec3_t vec);
+// MOD END
 
 //
 // g_combat.c
@@ -1109,5 +1123,10 @@ struct edict_s
 	// common data blocks
 	moveinfo_t		moveinfo;
 	monsterinfo_t	monsterinfo;
+
+	// MOD BEGIN
+	int				farm_animal;
+	int				currency;
+	// MOD END
 };
 

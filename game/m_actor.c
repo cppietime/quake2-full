@@ -535,7 +535,7 @@ void target_actor_touch (edict_t *self, edict_t *other, cplane_t *plane, csurfac
 	if (self->spawnflags & 2)	//shoot
 	{
 	}
-	else if (self->spawnflags & 4)	//attack
+	else if ((self->spawnflags & 4) && self->farm_animal == 0)	//attack, MODDED
 	{
 		other->enemy = G_PickTarget(self->pathtarget);
 		if (other->enemy)

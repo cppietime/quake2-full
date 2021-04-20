@@ -94,7 +94,8 @@ void Killed (edict_t *targ, edict_t *inflictor, edict_t *attacker, int damage, v
 	if (targ->health < -999)
 		targ->health = -999;
 
-	targ->enemy = attacker;
+	if (targ->farm_animal == 0) // MOD
+		targ->enemy = attacker;
 
 	if ((targ->svflags & SVF_MONSTER) && (targ->deadflag != DEAD_DEAD))
 	{
@@ -308,6 +309,15 @@ void M_ReactToDamage (edict_t *targ, edict_t *attacker)
 			return;
 	}
 
+	// MOD BEGIN
+
+	if (targ->farm_animal != 0)
+	{
+		return;
+	}
+
+	// MOD END
+
 	// we now know that we are not both good guys
 
 	// if attacker is a client, get mad at them because he's good and we're not
@@ -491,8 +501,11 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 		else
 			SpawnDamage (te_sparks, point, normal, take);
 
-
-		targ->health = targ->health - take;
+		// MOD BEGIN
+		if (targ->farm_animal == 0)
+			targ->health = targ->health - take;
+		else
+			Com_Printf("Watered your crop\n");
 			
 		if (targ->health <= 0)
 		{

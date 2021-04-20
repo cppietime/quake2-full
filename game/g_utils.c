@@ -404,6 +404,13 @@ void G_InitEdict (edict_t *e)
 	e->classname = "noclass";
 	e->gravity = 1.0;
 	e->s.number = e - g_edicts;
+
+	// MOD BEGIN
+
+	e->farm_animal = 0;
+	e->currency = 10;
+
+	// MOD END
 }
 
 /*
@@ -565,4 +572,20 @@ qboolean KillBox (edict_t *ent)
 	}
 
 	return true;		// all clear
+}
+
+// MOD BEGIN
+
+void
+anglestovec(vec3_t angles, vec3_t vec)
+{
+	float pitch;
+	float yaw;
+	float forward;
+	pitch = -angles[PITCH] * M_PI / 180;
+	yaw = angles[YAW] * M_PI / 180;
+	vec[2] = sin(pitch);
+	forward = cos(pitch);
+	vec[0] = forward * cos(yaw);
+	vec[1] = forward * sin(yaw);
 }

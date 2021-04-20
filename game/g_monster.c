@@ -427,6 +427,15 @@ void monster_think (edict_t *self)
 	M_CatagorizePosition (self);
 	M_WorldEffects (self);
 	M_SetEffects (self);
+
+	// MOD BEGIN
+
+	if (self->farm_animal != 0)
+	{
+		self->enemy = NULL;
+	}
+
+	// MOD END
 }
 
 

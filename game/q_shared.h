@@ -1009,6 +1009,8 @@ typedef enum
 #define STAT_CHASE				16
 #define STAT_SPECTATOR			17
 
+#define STAT_MONEY				18 // MOD TEST LINE
+
 #define	MAX_STATS				32
 
 

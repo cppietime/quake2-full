@@ -905,6 +905,34 @@ void Cmd_PlayerList_f(edict_t *ent)
 ClientCommand
 =================
 */
+void SP_monster_berserk(edict_t *self); // MOD LINE, can remove
+// MOD BEGIN
+void spawner_touch(edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf)
+{
+	int		mod;
+
+	if (other == self->owner)
+		return;
+
+	if (surf && (surf->flags & SURF_SKY))
+	{
+		G_FreeEdict(self);
+		return;
+	}
+
+	if (self->owner->client)
+		PlayerNoise(self->owner, self->s.origin, PNOISE_IMPACT);
+
+	edict_t *monster = G_Spawn();
+	monster->farm_animal = 1;
+	SP_monster_berserk(monster);
+	VectorCopy(self->s.origin, monster->s.origin);
+
+	G_FreeEdict(self);
+}
+// MOD END
+// TODO Put this in a proper function to do all its stuff
+
 void ClientCommand (edict_t *ent)
 {
 	char	*cmd;
@@ -913,6 +941,54 @@ void ClientCommand (edict_t *ent)
 		return;		// not fully in game yet
 
 	cmd = gi.argv(0);
+
+	// MOD BEGIN
+
+	if (Q_stricmp(cmd, "plant") == 0)
+	{
+		// TODO place all this in a proper function elsewhere, right now it kinda sucks
+		vec3_t dir;
+		AngleVectors(ent->client->v_angle, dir, NULL, NULL);
+		Com_Printf("Peepee poopoo %f, %f, %f\n", dir[0], dir[1], dir[2]);
+
+		edict_t *bolt = G_Spawn();
+		bolt->svflags = SVF_DEADMONSTER;
+		// yes, I know it looks weird that projectiles are deadmonsters
+		// what this means is that when prediction is used against the object
+		// (blaster/hyperblaster shots), the player won't be solid clipped against
+		// the object.  Right now trying to run into a firing hyperblaster
+		// is very jerky since you are predicted 'against' the shots.
+		VectorCopy(ent->s.origin, bolt->s.origin);
+		VectorCopy(ent->s.origin, bolt->s.old_origin);
+		vectoangles(dir, bolt->s.angles);
+
+		VectorScale(dir, 1000, bolt->velocity);
+		bolt->movetype = MOVETYPE_FLYMISSILE;
+		bolt->clipmask = MASK_SHOT;
+		bolt->s.effects |= EF_BLASTER;
+		bolt->solid = SOLID_BBOX;
+		VectorClear(bolt->mins);
+		VectorClear(bolt->maxs);
+		bolt->s.modelindex = gi.modelindex("models/objects/laser/tris.md2");
+		bolt->s.sound = gi.soundindex("misc/lasfly.wav");
+		bolt->owner = ent;
+		bolt->touch = spawner_touch;
+		bolt->nextthink = level.time + 2;
+		bolt->think = G_FreeEdict;
+		bolt->dmg = 0;
+		bolt->classname = "bolt";
+		gi.linkentity(bolt);
+		trace_t tr = gi.trace(ent->s.origin, NULL, NULL, bolt->s.origin, bolt, MASK_SHOT);
+		if (tr.fraction < 1.0)
+		{
+			VectorMA(bolt->s.origin, -10, dir, bolt->s.origin);
+			bolt->touch(bolt, tr.ent, NULL, NULL);
+		}
+
+		return;
+	}
+
+	// MOD END
 
 	if (Q_stricmp (cmd, "players") == 0)
 	{

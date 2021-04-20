@@ -346,46 +346,59 @@ void fire_blaster (edict_t *self, vec3_t start, vec3_t dir, int damage, int spee
 {
 	edict_t	*bolt;
 	trace_t	tr;
+	vec3_t dirHold;
 
 	VectorNormalize (dir);
 
-	bolt = G_Spawn();
-	bolt->svflags = SVF_DEADMONSTER;
-	// yes, I know it looks weird that projectiles are deadmonsters
-	// what this means is that when prediction is used against the object
-	// (blaster/hyperblaster shots), the player won't be solid clipped against
-	// the object.  Right now trying to run into a firing hyperblaster
-	// is very jerky since you are predicted 'against' the shots.
-	VectorCopy (start, bolt->s.origin);
-	VectorCopy (start, bolt->s.old_origin);
-	vectoangles (dir, bolt->s.angles);
-	VectorScale (dir, speed, bolt->velocity);
-	bolt->movetype = MOVETYPE_FLYMISSILE;
-	bolt->clipmask = MASK_SHOT;
-	bolt->solid = SOLID_BBOX;
-	bolt->s.effects |= effect;
-	VectorClear (bolt->mins);
-	VectorClear (bolt->maxs);
-	bolt->s.modelindex = gi.modelindex ("models/objects/laser/tris.md2");
-	bolt->s.sound = gi.soundindex ("misc/lasfly.wav");
-	bolt->owner = self;
-	bolt->touch = blaster_touch;
-	bolt->nextthink = level.time + 2;
-	bolt->think = G_FreeEdict;
-	bolt->dmg = damage;
-	bolt->classname = "bolt";
-	if (hyper)
-		bolt->spawnflags = 1;
-	gi.linkentity (bolt);
+	VectorCopy(dir, dirHold); // MOD TEST
 
-	if (self->client)
-		check_dodge (self, bolt->s.origin, dir, speed);
+	// This for loop is added by a mod for test purposes, its contents were not except where specified
 
-	tr = gi.trace (self->s.origin, NULL, NULL, bolt->s.origin, bolt, MASK_SHOT);
-	if (tr.fraction < 1.0)
-	{
-		VectorMA (bolt->s.origin, -10, dir, bolt->s.origin);
-		bolt->touch (bolt, tr.ent, NULL, NULL);
+	for (int i = 0; i < 10; i++) {
+
+		bolt = G_Spawn();
+		bolt->svflags = SVF_DEADMONSTER;
+		// yes, I know it looks weird that projectiles are deadmonsters
+		// what this means is that when prediction is used against the object
+		// (blaster/hyperblaster shots), the player won't be solid clipped against
+		// the object.  Right now trying to run into a firing hyperblaster
+		// is very jerky since you are predicted 'against' the shots.
+		VectorCopy(start, bolt->s.origin);
+		VectorCopy(start, bolt->s.old_origin);
+		vectoangles(dirHold, bolt->s.angles);
+
+		bolt->s.angles[PITCH] += 45 - 9 * i; // MOD TEST LINE
+		anglestovec(bolt->s.angles, dir); // MOD TEST LINE
+
+		VectorScale(dir, speed, bolt->velocity);
+		bolt->movetype = MOVETYPE_FLYMISSILE;
+		bolt->clipmask = MASK_SHOT;
+		bolt->solid = SOLID_BBOX;
+		bolt->s.effects |= effect;
+		VectorClear(bolt->mins);
+		VectorClear(bolt->maxs);
+		bolt->s.modelindex = gi.modelindex("models/objects/laser/tris.md2");
+		bolt->s.sound = gi.soundindex("misc/lasfly.wav");
+		bolt->owner = self;
+		bolt->touch = blaster_touch;
+		bolt->nextthink = level.time + 2;
+		bolt->think = G_FreeEdict;
+		bolt->dmg = damage;
+		bolt->classname = "bolt";
+		if (hyper)
+			bolt->spawnflags = 1;
+		gi.linkentity(bolt);
+
+		if (self->client)
+			check_dodge(self, bolt->s.origin, dir, speed);
+
+		tr = gi.trace(self->s.origin, NULL, NULL, bolt->s.origin, bolt, MASK_SHOT);
+		if (tr.fraction < 1.0)
+		{
+			VectorMA(bolt->s.origin, -10, dir, bolt->s.origin);
+			bolt->touch(bolt, tr.ent, NULL, NULL);
+		}
+
 	}
 }	
 

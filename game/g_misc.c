@@ -1674,7 +1674,7 @@ static void func_clock_format_countdown (edict_t *self)
 
 void func_clock_think (edict_t *self)
 {
-	if (!self->enemy)
+	if (!self->enemy && self->farm_animal == 0) // EDITED BY MOD
 	{
 		self->enemy = G_Find (NULL, FOFS(targetname), self->target);
 		if (!self->enemy)

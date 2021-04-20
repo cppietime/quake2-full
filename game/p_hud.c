@@ -380,6 +380,13 @@ void G_SetStats (edict_t *ent)
 	int			index, cells;
 	int			power_armor_type;
 
+	// BEGIN MOD
+	// MOD STATS
+
+	ent->client->ps.stats[STAT_MONEY] = ent->currency;
+
+	// END MOD
+
 	//
 	// health
 	//

@@ -833,7 +833,7 @@ void soldier_dodge (edict_t *self, edict_t *attacker, float eta)
 	if (r > 0.25)
 		return;
 
-	if (!self->enemy)
+	if (!self->enemy && self->farm_animal == 0) // EDITED BY MOD
 		self->enemy = attacker;
 
 	if (skill->value == 0)

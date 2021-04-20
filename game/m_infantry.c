@@ -468,7 +468,7 @@ void infantry_dodge (edict_t *self, edict_t *attacker, float eta)
 	if (random() > 0.25)
 		return;
 
-	if (!self->enemy)
+	if (!self->enemy && self->farm_animal == 0) // MOD
 		self->enemy = attacker;
 
 	self->monsterinfo.currentmove = &infantry_move_duck;

@@ -654,6 +654,13 @@ char *single_statusbar =
 "xv	50 "
 "pic 0 "
 
+// MOD BEGIN MONEY
+"xv 200 "
+"string2 \"$\" "
+"xv 225 "
+"num 2 18 "
+// MOD END
+
 // ammo
 "if 2 "
 "	xv	100 "

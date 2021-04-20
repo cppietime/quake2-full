@@ -410,6 +410,15 @@ qboolean FindTarget (edict_t *self)
 	qboolean	heardit;
 	int			r;
 
+	// MOD BEGIN
+
+	if (self->farm_animal != 0) {
+		self->enemy = NULL;
+		return false;
+	}
+
+	// MOD END
+
 	if (self->monsterinfo.aiflags & AI_GOOD_GUY)
 	{
 		if (self->goalentity && self->goalentity->inuse && self->goalentity->classname)
@@ -834,7 +843,7 @@ qboolean ai_checkattack (edict_t *self, float dist)
 	{
 		self->enemy = NULL;
 	// FIXME: look all around for other targets
-		if (self->oldenemy && self->oldenemy->health > 0)
+		if (self->oldenemy && self->oldenemy->health > 0 && self->farm_animal == 0) // MOD
 		{
 			self->enemy = self->oldenemy;
 			self->oldenemy = NULL;
