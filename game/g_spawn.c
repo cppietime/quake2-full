@@ -658,7 +658,7 @@ char *single_statusbar =
 "xv 200 "
 "string2 \"$\" "
 "xv 225 "
-"num 2 18 "
+"num 4 18 "
 // MOD END
 
 // ammo

@@ -505,7 +505,52 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 		if (targ->farm_animal == 0)
 			targ->health = targ->health - take;
 		else
-			Com_Printf("Watered your crop\n");
+		{
+			gitem_t *weapon = attacker->client->pers.weapon;
+			if (targ->monsterinfo.next_water_time <= level.time && weapon == FindItem("blaster")) {
+				targ->monsterinfo.next_water_time = level.time + targ->monsterinfo.water_time;
+				if (attacker->shop_mode)
+				{
+					Com_Printf("Attempt hyperwater\n");
+					targ->monsterinfo.next_produce_time -= 50;
+				}
+				else
+				{
+					Com_Printf("Attempt water\n");
+					targ->monsterinfo.next_produce_time -= 5;
+				}
+			}
+			else if (targ->monsterinfo.next_fert_time <= level.time && weapon == FindItem("railgun")) {
+				targ->monsterinfo.next_fert_time = level.time + targ->monsterinfo.fert_time;
+				if (attacker->shop_mode)
+				{
+					Com_Printf("Attempt fert\n");
+					targ->monsterinfo.produce_val *= 1.5;
+				}
+				else
+				{
+					Com_Printf("Attempt fert\n");
+					targ->monsterinfo.produce_val *= 1.1;
+				}
+			}
+			else if (targ->monsterinfo.next_prune_time <= level.time && weapon == FindItem("chaingun")) {
+				targ->monsterinfo.next_prune_time = level.time + targ->monsterinfo.prune_time;
+				if (attacker->shop_mode)
+				{
+					Com_Printf("Attempt prune\n");
+					attacker->currency += targ->health;
+					targ->health = 0;
+				}
+				else
+				{
+					Com_Printf("Attempt prune\n");
+					int take = targ->max_health / 4;
+					attacker->currency += take;
+					targ->health -= take;
+				}
+			}
+		}
+		// MOD END
 			
 		if (targ->health <= 0)
 		{

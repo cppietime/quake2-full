@@ -433,6 +433,18 @@ void monster_think (edict_t *self)
 	if (self->farm_animal != 0)
 	{
 		self->enemy = NULL;
+		if (level.time >= self->monsterinfo.next_produce_time) {
+			Com_Printf("PRODUCTION!!! %p -> (%d)\n", self->monsterinfo.farmer, self->monsterinfo.farmer->currency);
+			self->monsterinfo.next_produce_time = level.time + self->monsterinfo.produce_time;
+			self->monsterinfo.farmer->currency += self->monsterinfo.produce_val;
+		}
+	}
+	else
+	{
+		// Remove non-plant monsters
+		self->health = 0;
+		gi.unlinkentity(self);
+		G_FreeEdict(self);
 	}
 
 	// MOD END

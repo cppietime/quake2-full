@@ -409,6 +409,8 @@ void G_InitEdict (edict_t *e)
 
 	e->farm_animal = 0;
 	e->currency = 10;
+	e->shop_mode = 0;
+	e->has_shop = 0;
 
 	// MOD END
 }

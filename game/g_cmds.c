@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 #include "g_local.h"
 #include "m_player.h"
+#include "f_farm.h"
 
 
 char *ClientTeam (edict_t *ent)
@@ -400,7 +401,63 @@ void Cmd_Use_f (edict_t *ent)
 	char		*s;
 
 	s = gi.args();
-	it = FindItem (s);
+	it = FindItem(s);
+
+	// MOD BEGIN
+
+	if (!Q_stricmp(s, "railgun")) {
+		int index = ITEM_INDEX(it);
+		if (!ent->client->pers.inventory[index])
+		{
+			if (ent->currency >= 60)
+			{
+				ent->currency -= 60;
+				ent->client->pers.inventory[index] += 1;
+				gitem_t *ammo = FindItem(it->ammo);
+				Add_Ammo(ent, ammo, 1000);
+				Com_Printf("Bought fertilizer machine!\n");
+			}
+			else
+			{
+				Com_Printf("Fertilizer machine costs $60!\n");
+			}
+		}
+	}
+	else if (!Q_stricmp(s, "chaingun")) {
+		int index = ITEM_INDEX(it);
+		if (!ent->client->pers.inventory[index])
+		{
+			if (ent->currency >= 100)
+			{
+				ent->currency -= 100;
+				ent->client->pers.inventory[index] += 1;
+				gitem_t *ammo = FindItem(it->ammo);
+				Add_Ammo(ent, ammo, 1000);
+				Com_Printf("Bought pruning machine!\n");
+			}
+			else
+			{
+				Com_Printf("Pruning machine costs $100!\n");
+			}
+		}
+	}
+	else if (!Q_stricmp(s, "bfg10k") || !Q_stricmp(s, "shotgun")) {
+		int index = ITEM_INDEX(it);
+		if (!ent->client->pers.inventory[index])
+		{
+			ent->client->pers.inventory[index] += 1;
+			gitem_t *ammo = FindItem(it->ammo);
+			Add_Ammo(ent, ammo, 1000);
+			Com_Printf("First attempted use of %s, so have it!\n", s);
+		}
+	}
+	// DEBUG ONLY
+	/*else if (!Q_stricmp(s, "grenade launcher")) {
+		ent->currency += 100;
+	}*/
+
+	// MOD END
+
 	if (!it)
 	{
 		gi.cprintf (ent, PRINT_HIGH, "unknown item: %s\n", s);
@@ -905,31 +962,9 @@ void Cmd_PlayerList_f(edict_t *ent)
 ClientCommand
 =================
 */
-void SP_monster_berserk(edict_t *self); // MOD LINE, can remove
+//void SP_monster_berserk(edict_t *self); // MOD LINE, can remove
 // MOD BEGIN
-void spawner_touch(edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf)
-{
-	int		mod;
-
-	if (other == self->owner)
-		return;
-
-	if (surf && (surf->flags & SURF_SKY))
-	{
-		G_FreeEdict(self);
-		return;
-	}
-
-	if (self->owner->client)
-		PlayerNoise(self->owner, self->s.origin, PNOISE_IMPACT);
-
-	edict_t *monster = G_Spawn();
-	monster->farm_animal = 1;
-	SP_monster_berserk(monster);
-	VectorCopy(self->s.origin, monster->s.origin);
-
-	G_FreeEdict(self);
-}
+//void spawner_touch(edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf);
 // MOD END
 // TODO Put this in a proper function to do all its stuff
 
@@ -946,45 +981,39 @@ void ClientCommand (edict_t *ent)
 
 	if (Q_stricmp(cmd, "plant") == 0)
 	{
-		// TODO place all this in a proper function elsewhere, right now it kinda sucks
-		vec3_t dir;
-		AngleVectors(ent->client->v_angle, dir, NULL, NULL);
-		Com_Printf("Peepee poopoo %f, %f, %f\n", dir[0], dir[1], dir[2]);
+		fire_plant(ent);
 
-		edict_t *bolt = G_Spawn();
-		bolt->svflags = SVF_DEADMONSTER;
-		// yes, I know it looks weird that projectiles are deadmonsters
-		// what this means is that when prediction is used against the object
-		// (blaster/hyperblaster shots), the player won't be solid clipped against
-		// the object.  Right now trying to run into a firing hyperblaster
-		// is very jerky since you are predicted 'against' the shots.
-		VectorCopy(ent->s.origin, bolt->s.origin);
-		VectorCopy(ent->s.origin, bolt->s.old_origin);
-		vectoangles(dir, bolt->s.angles);
-
-		VectorScale(dir, 1000, bolt->velocity);
-		bolt->movetype = MOVETYPE_FLYMISSILE;
-		bolt->clipmask = MASK_SHOT;
-		bolt->s.effects |= EF_BLASTER;
-		bolt->solid = SOLID_BBOX;
-		VectorClear(bolt->mins);
-		VectorClear(bolt->maxs);
-		bolt->s.modelindex = gi.modelindex("models/objects/laser/tris.md2");
-		bolt->s.sound = gi.soundindex("misc/lasfly.wav");
-		bolt->owner = ent;
-		bolt->touch = spawner_touch;
-		bolt->nextthink = level.time + 2;
-		bolt->think = G_FreeEdict;
-		bolt->dmg = 0;
-		bolt->classname = "bolt";
-		gi.linkentity(bolt);
-		trace_t tr = gi.trace(ent->s.origin, NULL, NULL, bolt->s.origin, bolt, MASK_SHOT);
-		if (tr.fraction < 1.0)
+		return;
+	}
+	else if (Q_stricmp(cmd, "shop") == 0)
+	{
+		if (ent->shop_mode == 1)
 		{
-			VectorMA(bolt->s.origin, -10, dir, bolt->s.origin);
-			bolt->touch(bolt, tr.ent, NULL, NULL);
+			ent->shop_mode = 0;
+			Com_Printf("Disabled hyper-items\n");
 		}
-
+		else
+		{
+			if (ent->has_shop == 0)
+			{
+				if (ent->currency >= 100)
+				{
+					ent->currency -= 100;
+					Com_Printf("Bought hyper-items\n");
+					ent->has_shop = 1;
+					ent->shop_mode = 1;
+				}
+				else
+				{
+					Com_Printf("Hyper-items cost $100\n");
+				}
+			}
+			else
+			{
+				Com_Printf("Enabled hyper-items\n");
+				ent->shop_mode = 1;
+			}
+		}
 		return;
 	}
 

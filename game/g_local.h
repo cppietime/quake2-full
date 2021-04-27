@@ -19,6 +19,9 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
 // g_local.h -- local definitions for game module
 
+#ifndef _H_G_LOCAL
+#define _H_G_LOCAL
+
 #include "q_shared.h"
 
 // define GAME_INCLUDE so that game.h does not define the
@@ -448,10 +451,17 @@ typedef struct
 
 	// MOD BEGIN
 
-	int			exp;
-	int			level;
 	float		produce_time;
+	float		next_produce_time;
+	float		water_time;
+	float		next_water_time;
+	float		fert_time;
+	float		next_fert_time;
+	float		prune_time;
+	float		next_prune_time;
 	int			produce_val;
+	int			annual;
+	edict_t		*farmer;
 
 	// MOD END
 
@@ -1127,6 +1137,9 @@ struct edict_s
 	// MOD BEGIN
 	int				farm_animal;
 	int				currency;
+	int				shop_mode;
+	int				has_shop;
 	// MOD END
 };
 
+#endif
