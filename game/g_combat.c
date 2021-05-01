@@ -511,12 +511,12 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 				targ->monsterinfo.next_water_time = level.time + targ->monsterinfo.water_time;
 				if (attacker->shop_mode)
 				{
-					Com_Printf("Attempt hyperwater\n");
+					Com_Printf("Plant hyperwatered\n");
 					targ->monsterinfo.next_produce_time -= 50;
 				}
 				else
 				{
-					Com_Printf("Attempt water\n");
+					Com_Printf("Plant watered\n");
 					targ->monsterinfo.next_produce_time -= 5;
 				}
 			}
@@ -524,12 +524,12 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 				targ->monsterinfo.next_fert_time = level.time + targ->monsterinfo.fert_time;
 				if (attacker->shop_mode)
 				{
-					Com_Printf("Attempt fert\n");
+					Com_Printf("Plant hyperfertilized\n");
 					targ->monsterinfo.produce_val *= 1.5;
 				}
 				else
 				{
-					Com_Printf("Attempt fert\n");
+					Com_Printf("Plant fertilized\n");
 					targ->monsterinfo.produce_val *= 1.1;
 				}
 			}
@@ -537,14 +537,14 @@ void T_Damage (edict_t *targ, edict_t *inflictor, edict_t *attacker, vec3_t dir,
 				targ->monsterinfo.next_prune_time = level.time + targ->monsterinfo.prune_time;
 				if (attacker->shop_mode)
 				{
-					Com_Printf("Attempt prune\n");
+					Com_Printf("Plant culled\n");
 					attacker->currency += targ->health;
 					targ->health = 0;
 				}
 				else
 				{
-					Com_Printf("Attempt prune\n");
 					int take = targ->max_health / 4;
+					Com_Printf("Plant pruned\n", take, targ->max_health);
 					attacker->currency += take;
 					targ->health -= take;
 				}

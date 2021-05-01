@@ -96,6 +96,7 @@ spawner_touch(edict_t *self, edict_t *other, cplane_t *plane, csurface_t *surf)
 		SP_monster_gladiator(monster);
 		break;
 	}
+	monster->max_health = monster->health;
 	monster->monsterinfo.next_produce_time = level.time + self->monsterinfo.produce_time;
 	VectorCopy(self->s.origin, monster->s.origin);
 	
@@ -108,7 +109,6 @@ void
 fire_plant(edict_t *self){
 	vec3_t dir;
 	AngleVectors(self->client->v_angle, dir, NULL, NULL);
-	Com_Printf("Peepee poopoo %f, %f, %f\n", dir[0], dir[1], dir[2]);
 
 	edict_t *bolt = G_Spawn();
 	bolt->svflags = SVF_DEADMONSTER;

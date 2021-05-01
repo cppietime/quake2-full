@@ -434,7 +434,6 @@ void monster_think (edict_t *self)
 	{
 		self->enemy = NULL;
 		if (level.time >= self->monsterinfo.next_produce_time) {
-			Com_Printf("PRODUCTION!!! %p -> (%d)\n", self->monsterinfo.farmer, self->monsterinfo.farmer->currency);
 			self->monsterinfo.next_produce_time = level.time + self->monsterinfo.produce_time;
 			self->monsterinfo.farmer->currency += self->monsterinfo.produce_val;
 		}

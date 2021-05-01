@@ -415,7 +415,7 @@ void Cmd_Use_f (edict_t *ent)
 				ent->client->pers.inventory[index] += 1;
 				gitem_t *ammo = FindItem(it->ammo);
 				Add_Ammo(ent, ammo, 1000);
-				Com_Printf("Bought fertilizer machine!\n");
+				Com_Printf("Bought fertilizer machine for $100!\n");
 			}
 			else
 			{
@@ -433,7 +433,7 @@ void Cmd_Use_f (edict_t *ent)
 				ent->client->pers.inventory[index] += 1;
 				gitem_t *ammo = FindItem(it->ammo);
 				Add_Ammo(ent, ammo, 1000);
-				Com_Printf("Bought pruning machine!\n");
+				Com_Printf("Bought pruning machine for $100!\n");
 			}
 			else
 			{
@@ -448,7 +448,7 @@ void Cmd_Use_f (edict_t *ent)
 			ent->client->pers.inventory[index] += 1;
 			gitem_t *ammo = FindItem(it->ammo);
 			Add_Ammo(ent, ammo, 1000);
-			Com_Printf("First attempted use of %s, so have it!\n", s);
+			//Com_Printf("First attempted use of %s, so have it!\n", s);
 		}
 	}
 	// DEBUG ONLY
@@ -999,7 +999,7 @@ void ClientCommand (edict_t *ent)
 				if (ent->currency >= 100)
 				{
 					ent->currency -= 100;
-					Com_Printf("Bought hyper-items\n");
+					Com_Printf("Bought hyper-items for $100\n");
 					ent->has_shop = 1;
 					ent->shop_mode = 1;
 				}
