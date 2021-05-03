@@ -34,3 +34,6 @@ As mentioned above, each seed type has an associated cost that must be paid each
 
 ## Upgraded Items
 The 9 key has been remapped to swapping the item mode of the player between default and upgraded. In order to buy upgraded items, you must spend $100 the first time. After that, while upgraded items are equipped, watering, fertilizing, and pruning all have extra strength. Pruning, in fact, will 1-shot any crop and immediately kill it.  
+
+## Installing
+Unzip the farmingmod.zip file into your quake2 directory and run the included .bat file.
